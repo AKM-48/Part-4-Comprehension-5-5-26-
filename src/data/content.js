@@ -41,6 +41,7 @@ export const presentationContent = {
     "We have been able to voice our gender equality message from a different speaker — a football club — and share the gender equality and women’s empowerment message in a new way and with an audience not necessarily familiar with our work — the football stars, players and football fans.",
     "This is UN Women’s first global partnership with a sports club and VCF is a key partner in the sports sector and industry to communicate the gender equality and women’s empowerment agenda to its particular audience while contributing to the core resources of the organization.",
     "The partnership aims to promote gender equality and features the UN Women logo on players’ jerseys, stadium banners and in the club’s social media. It also includes special matches and soccer clinics all over the world.",
+    "Together, we are onside for gender equality.",
   ],
   assignmentQuestions: [
     {
