@@ -18,20 +18,36 @@ export const presentationContent = {
     answerTitle: "Answer",
     evidenceTitle: "Evidence from the Text",
     backToMenu: "Back to Menu",
-    start: "Start",
+    start: "Start Game",
+    playAgain: "Play Again",
     restart: "Restart",
-    footballQuizKicker: "Football Quiz Game",
+    revealFinalMessage: "Reveal Final Message",
+    footballChallengeKicker: "Football Skill Challenge",
     goalCounter: "Goal Counter",
     tryAgain:
       "Try again. Look for the answer that best matches the text.",
     correctAnswerTitle: "Correct Answer",
     nextQuestion: "Next Question",
     showVictory: "Show Victory",
-    goalsComplete: "4/4 Goals",
+    kickoff: "KICKOFF!",
   },
   menuButtons: {
     summary: "Text Summary",
     game: "Mini Game",
+  },
+  summaryCards: {
+    intro: {
+      title: "Before the Quiz",
+      text: "This section explains how sport can be used to share messages about gender equality. The text focuses on how UN Women uses football partnerships, campaigns, and public events to reach wider audiences and challenge stereotypes.",
+    },
+    mainIdea: {
+      title: "Main Idea",
+      text: "Sport can be more than entertainment. It can help spread important messages, challenge stereotypes, and support equal opportunities for women and girls.",
+    },
+    briefSummary: {
+      title: "Brief Summary",
+      text: "The text shows that football can be used as a powerful tool to promote gender equality. By working with football clubs, players, fans, and public campaigns, UN Women can reach new audiences and encourage people to think differently about women’s empowerment and equal opportunities.",
+    },
   },
   originalText: [
     "Sport is an area in which we can leverage our partnerships and engagement with different audiences to teach everyone that gender-based violence has no place in it, on or off the field, anywhere in our lives and that a future where all playing fields are truly level for all women and girls can be achieved.",
@@ -95,9 +111,11 @@ export const presentationContent = {
     actions: ["Pass", "Shoot", "Defend"],
     progressLabels: [
       "Kickoff",
-      "Pass forward",
-      "Dribble closer",
-      "Shot on goal",
+      "Opening pass",
+      "Moving through midfield",
+      "Building the attack",
+      "Chance created",
+      "Shot lined up",
       "Goal scored",
     ],
     rounds: [
@@ -136,7 +154,7 @@ export const presentationContent = {
       },
       {
         round: 3,
-        visualAction: "Player shoots toward the goal",
+        visualAction: "Player moves the ball into space",
         question: "What is the main message of the text?",
         options: [
           { label: "A", action: "Pass", text: "Sport is only for entertainment" },
@@ -158,8 +176,7 @@ export const presentationContent = {
       },
       {
         round: 4,
-        label: "Extra Hard",
-        visualAction: "Player scores the final goal",
+        visualAction: "Player creates a clear chance",
         question: "Why is football especially effective for spreading equality messages?",
         options: [
           {
@@ -186,11 +203,79 @@ export const presentationContent = {
         quote:
           "share the gender equality and women’s empowerment message in a new way and with an audience not necessarily familiar with our work — the football stars, players and football fans",
         explanation:
-          "This is harder because it requires understanding why football is useful: it reaches people who may not already know UN Women’s work.",
+          "Football is useful because it reaches people who may not already know UN Women’s work.",
+      },
+      {
+        round: 5,
+        visualAction: "Player shoots toward the goal",
+        question: "What does the phrase “level playing fields” mean in the text?",
+        options: [
+          {
+            label: "A",
+            action: "Pass",
+            text: "Football pitches should be physically flatter",
+          },
+          {
+            label: "B",
+            action: "Shoot",
+            text: "Women and girls should have equal opportunities",
+            correct: true,
+          },
+          {
+            label: "C",
+            action: "Defend",
+            text: "Only professional players should support equality",
+          },
+        ],
+        correctAnswer: "B. Women and girls should have equal opportunities",
+        evidence:
+          "a future where all playing fields are truly level for all women and girls can be achieved",
+        quote:
+          "a future where all playing fields are truly level for all women and girls can be achieved",
+        explanation:
+          "The phrase “level playing fields” is used as a metaphor. It means fairness and equal opportunities for women and girls.",
+      },
+      {
+        round: 6,
+        visualAction: "Player scores the final goal",
+        question: "Which idea is an example of a stereotype?",
+        options: [
+          {
+            label: "A",
+            action: "Pass",
+            text: "Everyone should have equal opportunities",
+          },
+          {
+            label: "B",
+            action: "Shoot",
+            text: "Football can help spread important messages",
+          },
+          {
+            label: "C",
+            action: "Defend",
+            text: "Only men are responsible for football and leadership",
+            correct: true,
+          },
+        ],
+        correctAnswer:
+          "C. Only men are responsible for football and leadership",
+        evidence:
+          "change stereotypes, challenge misconceptions of masculinity",
+        quote:
+          "change stereotypes, challenge misconceptions of masculinity",
+        explanation:
+          "A stereotype is an unfair or oversimplified idea about a group of people. This answer is a stereotype because it unfairly connects football and leadership mainly with men.",
       },
     ],
     victoryTitle: "Goal for Equality!",
+    victoryMessage: "You completed the challenge and reached the final goal.",
+    goodLuck: "Good luck on your actual quiz!",
     finalSummary:
       "The text shows that sport can be used to send powerful messages about gender equality. Through football, these messages can reach new audiences, challenge stereotypes, and support the idea that women and girls should have equal opportunities.",
+    finalMessage: {
+      title: "Final Message",
+      text: "Sport is more than a game. It can bring people together, spread important messages, challenge stereotypes, and help create a fairer future for women and girls.",
+      thanks: "Thank you for playing.",
+    },
   },
 };

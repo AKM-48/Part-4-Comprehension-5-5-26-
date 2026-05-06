@@ -47,6 +47,7 @@ function MainMenu({ onNavigate }) {
 
 function SummaryView({ onBack }) {
   const { ui } = presentationContent;
+  const { summaryCards } = presentationContent;
   const questions = presentationContent.assignmentQuestions;
   const [questionIndex, setQuestionIndex] = useState(0);
   const [revealed, setRevealed] = useState({});
@@ -61,6 +62,19 @@ function SummaryView({ onBack }) {
   return (
     <section className="summary-screen screen">
       <TopBar eyebrow={ui.summaryEyebrow} onBack={onBack} />
+
+      <div className="summary-top-cards">
+        <SummaryCard
+          title={summaryCards.intro.title}
+          text={summaryCards.intro.text}
+          variant="intro"
+        />
+        <SummaryCard
+          title={summaryCards.mainIdea.title}
+          text={summaryCards.mainIdea.text}
+          variant="main-idea"
+        />
+      </div>
 
       <div className="summary-layout">
         <section className="reading-panel" aria-labelledby="original-text-title">
@@ -136,6 +150,23 @@ function SummaryView({ onBack }) {
           )}
         </section>
       </div>
+
+      <div className="summary-bottom-card">
+        <SummaryCard
+          title={summaryCards.briefSummary.title}
+          text={summaryCards.briefSummary.text}
+          variant="brief"
+        />
+      </div>
+    </section>
+  );
+}
+
+function SummaryCard({ title, text, variant }) {
+  return (
+    <section className={`summary-card ${variant}`}>
+      <h2>{title}</h2>
+      <p>{text}</p>
     </section>
   );
 }
@@ -144,29 +175,41 @@ function GameView({ onBack }) {
   const game = presentationContent.miniGame;
   const { ui } = presentationContent;
   const [started, setStarted] = useState(false);
+  const [kickoff, setKickoff] = useState(false);
   const [roundIndex, setRoundIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [result, setResult] = useState("idle");
   const [victory, setVictory] = useState(false);
+  const [finalMessage, setFinalMessage] = useState(false);
   const round = game.rounds[roundIndex];
+  const totalRounds = game.rounds.length;
 
   const resetGame = () => {
     setStarted(false);
+    setKickoff(false);
     setRoundIndex(0);
     setProgress(0);
     setSelectedOption(null);
     setResult("idle");
     setVictory(false);
+    setFinalMessage(false);
   };
 
   const startGame = () => {
-    setStarted(true);
+    setStarted(false);
+    setKickoff(true);
     setRoundIndex(0);
     setProgress(0);
     setSelectedOption(null);
     setResult("idle");
     setVictory(false);
+    setFinalMessage(false);
+  };
+
+  const finishKickoff = () => {
+    setKickoff(false);
+    setStarted(true);
   };
 
   const chooseOption = (option) => {
@@ -185,7 +228,7 @@ function GameView({ onBack }) {
   };
 
   const nextRound = () => {
-    if (roundIndex === game.rounds.length - 1) {
+    if (roundIndex === totalRounds - 1) {
       setVictory(true);
       return;
     }
@@ -195,14 +238,27 @@ function GameView({ onBack }) {
     setResult("idle");
   };
 
+  if (kickoff) {
+    return (
+      <section className="game-screen screen">
+        <TopBar eyebrow={ui.gameEyebrow} onBack={onBack} />
+        <KickoffTransition onFinish={finishKickoff} />
+      </section>
+    );
+  }
+
   if (!started) {
     return (
       <section className="game-screen screen">
         <TopBar eyebrow={ui.gameEyebrow} onBack={onBack} />
         <div className="game-intro">
-          <FootballField progress={0} label={game.progressLabels[0]} />
+          <FootballField
+            progress={0}
+            total={totalRounds}
+            label={game.progressLabels[0]}
+          />
           <div className="intro-copy">
-            <p className="kicker">{ui.footballQuizKicker}</p>
+            <p className="kicker">{ui.footballChallengeKicker}</p>
             <h1>{game.title}</h1>
             <p>{game.intro}</p>
             <button className="pixel-button accent" onClick={startGame}>
@@ -214,22 +270,47 @@ function GameView({ onBack }) {
     );
   }
 
+  if (finalMessage) {
+    return (
+      <FinalMessageScreen
+        game={game}
+        total={totalRounds}
+        onBack={onBack}
+        onPlayAgain={resetGame}
+      />
+    );
+  }
+
   if (victory) {
     return (
       <section className="game-screen screen">
         <TopBar eyebrow={ui.gameCompleteEyebrow} onBack={onBack} />
         <div className="victory-layout">
-          <FootballField progress={4} label={game.progressLabels[4]} />
+          <FootballField
+            progress={totalRounds}
+            total={totalRounds}
+            label={game.progressLabels[totalRounds]}
+          />
           <div className="victory-copy">
-            <p className="kicker">{ui.goalsComplete}</p>
+            <p className="kicker">
+              {totalRounds}/{totalRounds} Goals
+            </p>
             <h1>{game.victoryTitle}</h1>
+            <p>{game.victoryMessage}</p>
+            <p className="good-luck">{game.goodLuck}</p>
             <p>{game.finalSummary}</p>
             <div className="button-row">
               <button className="pixel-button accent" onClick={resetGame}>
-                {ui.restart}
+                {ui.playAgain}
               </button>
               <button className="pixel-button neutral" onClick={onBack}>
                 {ui.backToMenu}
+              </button>
+              <button
+                className="pixel-button primary"
+                onClick={() => setFinalMessage(true)}
+              >
+                {ui.revealFinalMessage}
               </button>
             </div>
           </div>
@@ -242,18 +323,21 @@ function GameView({ onBack }) {
     <section className="game-screen screen">
       <TopBar eyebrow={game.title} onBack={onBack} />
       <div className="game-layout">
-        <FootballField progress={progress} label={game.progressLabels[progress]} />
+        <FootballField
+          progress={progress}
+          total={totalRounds}
+          label={game.progressLabels[progress]}
+        />
 
         <section className="challenge-panel" aria-labelledby="round-question">
           <div className="round-header">
             <div>
               <p className="kicker">
-                {ui.roundLabel} {round.round} {ui.ofLabel} {game.rounds.length}
-                {round.label ? ` - ${round.label}` : ""}
+                {ui.roundLabel} {round.round} {ui.ofLabel} {totalRounds}
               </p>
               <h2 id="round-question">{round.question}</h2>
             </div>
-            <GoalCounter progress={progress} total={game.rounds.length} />
+            <GoalCounter progress={progress} total={totalRounds} />
           </div>
 
           <div className="option-grid" aria-label="Answer choices">
@@ -297,7 +381,7 @@ function GameView({ onBack }) {
                 />
                 <p className="field-note">{round.visualAction}.</p>
                 <button className="pixel-button primary" onClick={nextRound}>
-                  {roundIndex === game.rounds.length - 1
+                  {roundIndex === totalRounds - 1
                     ? ui.showVictory
                     : ui.nextQuestion}
                 </button>
@@ -305,6 +389,68 @@ function GameView({ onBack }) {
             )}
           </div>
         </section>
+      </div>
+    </section>
+  );
+}
+
+function KickoffTransition({ onFinish }) {
+  const { ui } = presentationContent;
+  const handleAnimationEnd = (event) => {
+    if (event.target === event.currentTarget) {
+      onFinish();
+    }
+  };
+
+  return (
+    <section className="kickoff-wrap" aria-label={ui.kickoff}>
+      <div className="kickoff-pitch">
+        <div className="kickoff-card" onAnimationEnd={handleAnimationEnd}>
+          <p className="kicker">Mini Game</p>
+          <h1>{ui.kickoff}</h1>
+          <div className="kickoff-ball" aria-hidden="true">
+            <span />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FinalMessageScreen({ game, total, onBack, onPlayAgain }) {
+  const { ui } = presentationContent;
+
+  return (
+    <section className="game-screen screen finale-screen">
+      <TopBar eyebrow={game.finalMessage.title} onBack={onBack} />
+      <div className="finale-layout">
+        <div className="finale-stage" aria-hidden="true">
+          <FootballField
+            progress={total}
+            total={total}
+            label={game.progressLabels[total]}
+          />
+          <div className="pixel-confetti one" />
+          <div className="pixel-confetti two" />
+          <div className="pixel-confetti three" />
+          <div className="pixel-confetti four" />
+          <div className="pixel-confetti five" />
+          <div className="pixel-confetti six" />
+        </div>
+        <div className="victory-copy finale-copy">
+          <p className="kicker">{game.victoryTitle}</p>
+          <h1>{game.finalMessage.title}</h1>
+          <p>{game.finalMessage.text}</p>
+          <p className="good-luck">{game.finalMessage.thanks}</p>
+          <div className="button-row">
+            <button className="pixel-button accent" onClick={onPlayAgain}>
+              {ui.playAgain}
+            </button>
+            <button className="pixel-button neutral" onClick={onBack}>
+              {ui.backToMenu}
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -326,24 +472,18 @@ function TopBar({ eyebrow, onBack }) {
   );
 }
 
-function FootballField({ progress, label }) {
-  const safeProgress = clamp(progress, 0, 4);
-  const ballPositions = [
-    { x: 8, y: 72 },
-    { x: 28, y: 63 },
-    { x: 50, y: 54 },
-    { x: 73, y: 46 },
-    { x: 92, y: 49 },
-  ];
-  const playerPositions = [
-    { x: 4, y: 61 },
-    { x: 20, y: 56 },
-    { x: 36, y: 50 },
-    { x: 52, y: 45 },
-    { x: 68, y: 45 },
-  ];
-  const ballPosition = ballPositions[safeProgress];
-  const playerPosition = playerPositions[safeProgress];
+function FootballField({ progress, total, label }) {
+  const safeTotal = Math.max(total, 1);
+  const safeProgress = clamp(progress, 0, safeTotal);
+  const progressRatio = safeProgress / safeTotal;
+  const ballPosition = {
+    x: 8 + progressRatio * 84,
+    y: 72 - progressRatio * 23,
+  };
+  const playerPosition = {
+    x: 4 + progressRatio * 64,
+    y: 61 - progressRatio * 16,
+  };
   const ballStyle = {
     "--ball-x": `${ballPosition.x}%`,
     "--ball-y": `${ballPosition.y}%`,
@@ -354,10 +494,13 @@ function FootballField({ progress, label }) {
   };
 
   return (
-    <section className="field-wrap" aria-label={`Football progress: ${progress} of 4`}>
+    <section
+      className="field-wrap"
+      aria-label={`Football progress: ${safeProgress} of ${safeTotal}`}
+    >
       <div className="score-strip">
         <span>{presentationContent.ui.goalCounter}</span>
-        <strong>{safeProgress}/4</strong>
+        <strong>{safeProgress}/{safeTotal}</strong>
       </div>
       <div className="football-field">
         <div className="field-stripe stripe-one" />
@@ -380,14 +523,17 @@ function FootballField({ progress, label }) {
           <span className="player-leg left" />
           <span className="player-leg right" />
         </div>
-        <div className={`pixel-ball ${safeProgress === 4 ? "scored" : ""}`} style={ballStyle}>
+        <div
+          className={`pixel-ball ${safeProgress === safeTotal ? "scored" : ""}`}
+          style={ballStyle}
+        >
           <span />
         </div>
       </div>
       <div className="progress-caption">
         <span>{label}</span>
         <div className="progress-track">
-          <span style={{ width: `${safeProgress * 25}%` }} />
+          <span style={{ width: `${progressRatio * 100}%` }} />
         </div>
       </div>
     </section>
@@ -396,7 +542,11 @@ function FootballField({ progress, label }) {
 
 function GoalCounter({ progress, total }) {
   return (
-    <div className="goal-counter" aria-label={`Progress ${progress} out of ${total}`}>
+    <div
+      className="goal-counter"
+      style={{ "--goal-count": total }}
+      aria-label={`Progress ${progress} out of ${total}`}
+    >
       {Array.from({ length: total }).map((_, index) => (
         <span className={index < progress ? "filled" : ""} key={index} />
       ))}
